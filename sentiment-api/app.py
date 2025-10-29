@@ -9,8 +9,10 @@ from google.cloud import storage
 import json
 import os
 
+
 # TEXT CLEANING
 _url = re.compile(r'https?://\S+|www\.\S+')
+
 
 def clean_text(text: str) -> str:
     """Clean and preprocess text for model input."""
@@ -19,12 +21,14 @@ def clean_text(text: str) -> str:
     toks = [w for w in t.split() if len(w) >= 2]
     return " ".join(toks)
 
+
 # MODEL LOADING FROM GCS
 BUCKET_NAME = "model_mlops"
 BLOB_PATH = "Team-14-v2.pickle"
 METADATA_PATH = "Team-14-v2_metadata.json"
 LOCAL_MODEL_PATH = "/tmp/model.pkl"
 LOCAL_METADATA_PATH = "/tmp/metadata.json"
+
 
 def load_model_from_gcs():
     """Download the latest production model and metadata from pipeline."""
@@ -62,11 +66,13 @@ def load_model_from_gcs():
     
     return model, vectorizer, metadata
 
+
 # Load model on startup
 print("🔄 Loading model from GCS...")
 MODEL, VECTORIZER, METADATA = load_model_from_gcs()
 print(f"✓ Loaded Model v{METADATA.get('current_version', '?')}")
 print(f"✓ Accuracy: {METADATA.get('current_accuracy', '?')}")
+
 
 # FASTAPI APP
 app = FastAPI(
@@ -74,6 +80,7 @@ app = FastAPI(
     description="Production ML API powered by automated MLOps pipeline",
     version=str(METADATA.get('current_version', '1.0'))
 )
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -83,8 +90,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class Review(BaseModel):
     text: str
+
 
 @app.get("/")
 def home():
@@ -94,6 +103,7 @@ def home():
         with open(html_file, 'r') as f:
             return HTMLResponse(content=f.read())
     return HTMLResponse(content=get_default_html())
+
 
 @app.get("/info")
 def get_info():
@@ -137,6 +147,7 @@ def get_info():
     # Remove None values
     return {k: v for k, v in response.items() if v is not None}
 
+
 @app.post("/predict")
 def predict(review: Review):
     """Predict sentiment for a given review."""
@@ -155,6 +166,7 @@ def predict(review: Review):
         "model_accuracy": METADATA.get('current_accuracy', METADATA.get('accuracy'))
     }
 
+
 @app.get("/health")
 def health():
     """Health check endpoint."""
@@ -165,6 +177,7 @@ def health():
         "metadata_loaded": bool(METADATA),
         "model_version": METADATA.get('current_version', METADATA.get('version', 1))
     }
+
 
 def get_default_html():
     """Return simplified HTML WITHOUT confusion matrix"""
@@ -310,6 +323,8 @@ document.getElementById('buttonLoading').classList.add('hidden');
 }}
 </script></body></html>"""
 
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
+ # Add blank line
