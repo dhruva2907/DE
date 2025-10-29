@@ -180,7 +180,7 @@ def health():
 
 
 def get_default_html():
-    """Return simplified HTML WITHOUT confusion matrix"""
+    """Return clean HTML with Champion/Challenger comparison"""
     return """<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Team 14 - Sentiment Analysis</title><style>
@@ -191,137 +191,200 @@ header{text-align:center;margin-bottom:50px}
 h1{font-size:2.5rem;background:linear-gradient(90deg,#00d4ff,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;font-weight:700}
 .subtitle{color:#888;font-size:1.1rem}
 .card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:30px;margin-bottom:30px;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
-.model-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px}
-.info-item{background:rgba(0,212,255,0.1);padding:15px;border-radius:10px;border-left:3px solid #00d4ff;transition:all 0.3s}
-.info-item:hover{background:rgba(0,212,255,0.15);transform:translateY(-2px)}
-.info-label{font-size:0.85rem;color:#888;text-transform:uppercase;letter-spacing:1px}
-.info-value{font-size:1.3rem;font-weight:600;color:#00d4ff;margin-top:5px}
+.champion-badge{display:inline-block;background:linear-gradient(90deg,#FFD700,#FFA500);color:#000;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;margin-left:10px;text-transform:uppercase}
+.challenger-badge{display:inline-block;background:rgba(255,64,129,0.2);border:1px solid #ff4081;color:#ff4081;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;margin-left:10px;text-transform:uppercase}
+.comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.model-card{background:rgba(0,0,0,0.3);border-radius:12px;padding:20px;border:2px solid rgba(255,255,255,0.1)}
+.model-card.champion{border-color:#FFD700}
+.model-card.challenger{border-color:#ff4081}
+.model-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.model-title{font-size:1.3rem;font-weight:600;color:#00d4ff}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;font-size:0.8rem;font-weight:600}
+.status-badge.active{background:rgba(0,255,136,0.2);color:#00ff88}
+.status-badge.rejected{background:rgba(255,64,129,0.2);color:#ff4081}
+.metric-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.metric-row:last-child{border-bottom:none}
+.metric-label{color:#aaa;font-size:0.9rem}
+.metric-value{color:#fff;font-weight:600;font-size:1.1rem}
+.metric-value.better{color:#00ff88}
+.metric-value.worse{color:#ff4081}
 .expand-btn{background:rgba(0,212,255,0.2);border:1px solid rgba(0,212,255,0.3);color:#00d4ff;padding:12px 24px;border-radius:8px;cursor:pointer;font-size:0.95rem;font-weight:600;transition:all 0.3s;margin-top:20px;width:100%}
 .expand-btn:hover{background:rgba(0,212,255,0.3);border-color:#00d4ff}
 .details{display:none;margin-top:20px;padding:20px;background:rgba(0,0,0,0.3);border-radius:12px;border:1px solid rgba(255,255,255,0.1)}
 .details.show{display:block;animation:slideDown 0.3s ease-out}
-.detail-section{margin-bottom:25px}
-.detail-section h3{color:#00ff88;font-size:1.2rem;margin-bottom:15px;border-bottom:2px solid rgba(0,255,136,0.3);padding-bottom:8px}
-.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
-.detail-item{background:rgba(255,255,255,0.03);padding:12px;border-radius:8px;border-left:2px solid rgba(0,212,255,0.5)}
-.detail-label{font-size:0.8rem;color:#aaa;text-transform:uppercase}
-.detail-value{font-size:1.1rem;color:#fff;margin-top:4px;font-weight:500}
-textarea{width:100%;min-height:150px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;padding:15px;color:#e0e0e0;font-size:1rem;font-family:inherit;resize:vertical;transition:all 0.3s}
+.detail-section{margin-bottom:20px}
+.detail-section h3{color:#00ff88;font-size:1.1rem;margin-bottom:12px}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.detail-item{background:rgba(255,255,255,0.03);padding:10px;border-radius:8px}
+.detail-label{font-size:0.75rem;color:#aaa;text-transform:uppercase}
+.detail-value{font-size:1rem;color:#fff;margin-top:4px}
+textarea{width:100%;min-height:120px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;padding:15px;color:#e0e0e0;font-size:1rem;font-family:inherit;resize:vertical;transition:all 0.3s}
 textarea:focus{outline:none;border-color:#00d4ff;box-shadow:0 0 20px rgba(0,212,255,0.2)}
 button{background:linear-gradient(90deg,#00d4ff,#00ff88);color:#000;border:none;padding:15px 40px;font-size:1.1rem;font-weight:600;border-radius:12px;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;width:100%;margin-top:15px}
 button:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,212,255,0.3)}
-button:active{transform:translateY(0)}
-.result{margin-top:30px;padding:20px;border-radius:12px;border-left:4px solid;animation:slideIn 0.3s ease-out}
+.result{margin-top:20px;padding:20px;border-radius:12px;border-left:4px solid;animation:slideIn 0.3s ease-out}
 .result.positive{background:rgba(0,255,136,0.1);border-color:#00ff88}
 .result.negative{background:rgba(255,64,129,0.1);border-color:#ff4081}
-.result-label{font-size:0.9rem;color:#888;text-transform:uppercase;letter-spacing:1px}
+.result-label{font-size:0.9rem;color:#888;text-transform:uppercase}
 .result-value{font-size:2rem;font-weight:700;margin-top:5px}
-.confidence{font-size:1.2rem;margin-top:10px;opacity:0.8}
 @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:2000px}}
 .hidden{display:none}
-.loading{display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#00d4ff;animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
 </style></head><body>
-<div class="container"><header><h1>Sentiment Analysis API</h1><p class="subtitle">Powered by Team 14 MLOps Pipeline</p></header>
-<div class="card"><h2 style="margin-bottom:20px;color:#00d4ff">Model Information</h2>
-<div class="model-info">
-<div class="info-item"><div class="info-label">Version</div><div class="info-value" id="version">Loading...</div></div>
-<div class="info-item"><div class="info-label">Accuracy</div><div class="info-value" id="accuracy">Loading...</div></div>
-<div class="info-item"><div class="info-label">Samples Trained</div><div class="info-value" id="samples">Loading...</div></div>
-<div class="info-item"><div class="info-label">Last Updated</div><div class="info-value" id="timestamp">Loading...</div></div>
+<div class="container"><header><h1>Sentiment Analysis API</h1><p class="subtitle">Champion/Challenger Model Comparison</p></header>
+
+<div class="card">
+<h2 style="margin-bottom:25px;color:#00d4ff">Model Version Comparison</h2>
+<div class="comparison-grid">
+<div class="model-card champion">
+<div class="model-header">
+<div class="model-title">Champion Model</div>
+<div class="status-badge active">● ACTIVE</div>
 </div>
-<button class="expand-btn" onclick="toggleDetails()">Show Detailed Metrics</button>
+<div class="metric-row">
+<div class="metric-label">Version</div>
+<div class="metric-value">v<span id="champ-version">1</span></div>
+</div>
+<div class="metric-row">
+<div class="metric-label">Accuracy</div>
+<div class="metric-value" id="champ-accuracy">-</div>
+</div>
+<div class="metric-row">
+<div class="metric-label">Precision</div>
+<div class="metric-value" id="champ-precision">-</div>
+</div>
+<div class="metric-row">
+<div class="metric-label">Recall</div>
+<div class="metric-value" id="champ-recall">-</div>
+</div>
+<div class="metric-row">
+<div class="metric-label">F1-Score</div>
+<div class="metric-value" id="champ-f1">-</div>
+</div>
+</div>
+
+<div class="model-card challenger">
+<div class="model-header">
+<div class="model-title">Latest Training</div>
+<div class="status-badge rejected" id="challenger-status">● REJECTED</div>
+</div>
+<div class="metric-row">
+<div class="metric-label">Version</div>
+<div class="metric-value">v<span id="challenger-version">-</span></div>
+</div>
+<div class="metric-row">
+<div class="metric-label">Accuracy</div>
+<div class="metric-value" id="challenger-accuracy">-</div>
+</div>
+<div class="metric-row">
+<div class="metric-label">Precision</div>
+<div class="metric-value" id="challenger-precision">-</div>
+</div>
+<div class="metric-row">
+<div class="metric-label">Recall</div>
+<div class="metric-value" id="challenger-recall">-</div>
+</div>
+<div class="metric-row">
+<div class="metric-label">F1-Score</div>
+<div class="metric-value" id="challenger-f1">-</div>
+</div>
+</div>
+</div>
+
+<button class="expand-btn" onclick="toggleDetails()">Show Training Details</button>
 <div class="details" id="detailsSection">
 <div class="detail-section">
-<h3>Performance Metrics</h3>
-<div class="detail-grid">
-<div class="detail-item"><div class="detail-label">Precision</div><div class="detail-value" id="precision">-</div></div>
-<div class="detail-item"><div class="detail-label">Recall</div><div class="detail-value" id="recall">-</div></div>
-<div class="detail-item"><div class="detail-label">F1-Score</div><div class="detail-value" id="f1">-</div></div>
-<div class="detail-item"><div class="detail-label">Training Duration</div><div class="detail-value" id="duration">-</div></div>
-</div>
-</div>
-<div class="detail-section">
-<h3>Dataset Information</h3>
-<div class="detail-grid">
-<div class="detail-item"><div class="detail-label">Total Samples</div><div class="detail-value" id="total">-</div></div>
-<div class="detail-item"><div class="detail-label">Test Samples</div><div class="detail-value" id="testSamples">-</div></div>
-<div class="detail-item"><div class="detail-label">Positive Samples</div><div class="detail-value" id="posSamples">-</div></div>
-<div class="detail-item"><div class="detail-label">Negative Samples</div><div class="detail-value" id="negSamples">-</div></div>
-<div class="detail-item"><div class="detail-label">Class Balance</div><div class="detail-value" id="balance">-</div></div>
-<div class="detail-item"><div class="detail-label">Features</div><div class="detail-value" id="features">-</div></div>
-</div>
-</div>
-<div class="detail-section">
-<h3>Model Configuration</h3>
+<h3>Training Configuration</h3>
 <div class="detail-grid">
 <div class="detail-item"><div class="detail-label">Algorithm</div><div class="detail-value" id="algo">-</div></div>
 <div class="detail-item"><div class="detail-label">Vectorizer</div><div class="detail-value" id="vec">-</div></div>
 <div class="detail-item"><div class="detail-label">Max Features</div><div class="detail-value" id="maxFeat">-</div></div>
-<div class="detail-item"><div class="detail-label">Max Iterations</div><div class="detail-value" id="maxIter">-</div></div>
+<div class="detail-item"><div class="detail-label">Samples Trained</div><div class="detail-value" id="samples">-</div></div>
+<div class="detail-item"><div class="detail-label">Training Time</div><div class="detail-value" id="duration">-</div></div>
+<div class="detail-item"><div class="detail-label">Last Updated</div><div class="detail-value" id="timestamp">-</div></div>
 </div>
 </div>
 </div>
 </div>
-<div class="card"><h2 style="margin-bottom:20px;color:#00d4ff">Test the Model</h2>
-<textarea id="reviewText" placeholder="Enter a movie review here...
 
-Example: This movie was absolutely amazing! The cinematography was stunning and the acting was superb. A masterpiece!"></textarea>
-<button onclick="predict()"><span id="buttonText">Analyze Sentiment</span><span id="buttonLoading" class="loading hidden"></span></button>
+<div class="card"><h2 style="margin-bottom:20px;color:#00d4ff">Test the Model</h2>
+<textarea id="reviewText" placeholder="Enter a movie review...
+
+Example: This movie was absolutely amazing! Great acting and plot."></textarea>
+<button onclick="predict()"><span id="buttonText">Analyze Sentiment</span></button>
 <div id="result" class="hidden"></div></div></div>
+
 <script>
 fetch('/info').then(r=>r.json()).then(data=>{
-document.getElementById('version').textContent='v'+data.version;
-document.getElementById('accuracy').textContent=(data.accuracy*100).toFixed(2)+'%';
-document.getElementById('samples').textContent=data.samples_trained.toLocaleString();
-document.getElementById('timestamp').textContent=new Date(data.timestamp).toLocaleDateString();
-document.getElementById('precision').textContent=data.precision?(data.precision*100).toFixed(2)+'%':'N/A';
-document.getElementById('recall').textContent=data.recall?(data.recall*100).toFixed(2)+'%':'N/A';
-document.getElementById('f1').textContent=data.f1_score?(data.f1_score*100).toFixed(2)+'%':'N/A';
-document.getElementById('duration').textContent=data.training_duration||'N/A';
-document.getElementById('total').textContent=data.total_samples?.toLocaleString()||'N/A';
-document.getElementById('testSamples').textContent=data.samples_tested?.toLocaleString()||'N/A';
-document.getElementById('posSamples').textContent=data.positive_samples?.toLocaleString()||'N/A';
-document.getElementById('negSamples').textContent=data.negative_samples?.toLocaleString()||'N/A';
-document.getElementById('balance').textContent=data.class_balance?(data.class_balance*100).toFixed(1)+'%':'N/A';
-document.getElementById('features').textContent=data.features?.toLocaleString()||'N/A';
-document.getElementById('algo').textContent=data.model_type||'N/A';
-document.getElementById('vec').textContent=data.vectorizer_type||'N/A';
-document.getElementById('maxFeat').textContent=data.max_features?.toLocaleString()||'N/A';
-document.getElementById('maxIter').textContent=data.max_iterations?.toLocaleString()||'N/A';
+const champAcc = data.previous_accuracy || data.accuracy;
+const challAcc = data.current_accuracy;
+const isChampion = data.is_champion;
+
+// Champion (production) model
+document.getElementById('champ-version').textContent = data.previous_version || data.version;
+document.getElementById('champ-accuracy').textContent = (champAcc*100).toFixed(2) + '%';
+document.getElementById('champ-precision').textContent = data.precision ? (data.precision*100).toFixed(2) + '%' : 'N/A';
+document.getElementById('champ-recall').textContent = data.recall ? (data.recall*100).toFixed(2) + '%' : 'N/A';
+document.getElementById('champ-f1').textContent = data.f1_score ? (data.f1_score*100).toFixed(2) + '%' : 'N/A';
+
+// Challenger (latest training)
+document.getElementById('challenger-version').textContent = data.current_version || data.version;
+document.getElementById('challenger-accuracy').textContent = (challAcc*100).toFixed(2) + '%';
+document.getElementById('challenger-accuracy').className = 'metric-value ' + (challAcc >= champAcc ? 'better' : 'worse');
+document.getElementById('challenger-precision').textContent = data.precision ? (data.precision*100).toFixed(2) + '%' : 'N/A';
+document.getElementById('challenger-recall').textContent = data.recall ? (data.recall*100).toFixed(2) + '%' : 'N/A';
+document.getElementById('challenger-f1').textContent = data.f1_score ? (data.f1_score*100).toFixed(2) + '%' : 'N/A';
+
+// Status badge
+const statusBadge = document.getElementById('challenger-status');
+if (isChampion) {
+    statusBadge.textContent = '● PROMOTED';
+    statusBadge.className = 'status-badge active';
+} else {
+    statusBadge.textContent = '● REJECTED';
+    statusBadge.className = 'status-badge rejected';
+}
+
+// Training details
+document.getElementById('algo').textContent = data.model_type || 'N/A';
+document.getElementById('vec').textContent = data.vectorizer_type || 'N/A';
+document.getElementById('maxFeat').textContent = data.max_features?.toLocaleString() || 'N/A';
+document.getElementById('samples').textContent = data.samples_trained?.toLocaleString() || 'N/A';
+document.getElementById('duration').textContent = data.training_duration_formatted || 'N/A';
+document.getElementById('timestamp').textContent = new Date(data.timestamp || data.current_timestamp).toLocaleDateString();
 });
+
 function toggleDetails(){
-const details=document.getElementById('detailsSection');
-const btn=event.target;
+const details = document.getElementById('detailsSection');
+const btn = event.target;
 if(details.classList.contains('show')){
-details.classList.remove('show');
-btn.textContent='Show Detailed Metrics';
-}else{
-details.classList.add('show');
-btn.textContent='Hide Detailed Metrics';
-}}
+    details.classList.remove('show');
+    btn.textContent='Show Training Details';
+} else {
+    details.classList.add('show');
+    btn.textContent='Hide Training Details';
+}
+}
+
 async function predict(){
-const text=document.getElementById('reviewText').value;
+const text = document.getElementById('reviewText').value;
 if(!text.trim()){alert('Please enter a review!');return;}
-document.getElementById('buttonText').classList.add('hidden');
-document.getElementById('buttonLoading').classList.remove('hidden');
-document.getElementById('result').classList.add('hidden');
+document.getElementById('buttonText').textContent = 'Analyzing...';
 try{
-const response=await fetch('/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text})});
-const data=await response.json();
-const resultDiv=document.getElementById('result');
-const sentiment=data.prediction===1?'Positive':'Negative';
-const probability=(data.probability*100).toFixed(2);
-const color=data.prediction===1?'positive':'negative';
-resultDiv.className='result '+color;
-resultDiv.innerHTML='<div class="result-label">Sentiment</div><div class="result-value">'+sentiment+'</div><div class="confidence">Confidence: '+probability+'%</div>';
-resultDiv.classList.remove('hidden');
+    const response = await fetch('/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text})});
+    const data = await response.json();
+    const resultDiv = document.getElementById('result');
+    const color = data.prediction === 1 ? 'positive' : 'negative';
+    resultDiv.className = 'result ' + color;
+    resultDiv.innerHTML = '<div class="result-label">Sentiment</div><div class="result-value">' + data.sentiment + '</div><div style="margin-top:10px;font-size:1.1rem">Confidence: ' + (data.probability*100).toFixed(2) + '%</div>';
+    resultDiv.classList.remove('hidden');
 }catch(e){alert('Error: '+e.message);}finally{
-document.getElementById('buttonText').classList.remove('hidden');
-document.getElementById('buttonLoading').classList.add('hidden');
-}}
+    document.getElementById('buttonText').textContent = 'Analyze Sentiment';
+}
+}
 </script></body></html>"""
+
+
 
 
 if __name__ == "__main__":
