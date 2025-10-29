@@ -3,9 +3,9 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/mlops-475717/mlops/sentiment-api:$SHORT_SHA'
+      - 'europe-west1-docker.pkg.dev/mlops-475717/cloud-run-source-deploy/sentiment-api:$SHORT_SHA'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/mlops-475717/mlops/sentiment-api:latest'
+      - 'europe-west1-docker.pkg.dev/mlops-475717/cloud-run-source-deploy/sentiment-api:latest'
       - '.'
     dir: 'sentiment-api'
 
@@ -13,14 +13,14 @@ steps:
     args:
       - 'push'
       - '--all-tags'
-      - 'europe-west1-docker.pkg.dev/mlops-475717/mlops/sentiment-api'
+      - 'europe-west1-docker.pkg.dev/mlops-475717/cloud-run-source-deploy/sentiment-api'
 
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'run'
       - 'deploy'
       - 'sentiment-api'
-      - '--image=europe-west1-docker.pkg.dev/mlops-475717/mlops/sentiment-api:$SHORT_SHA'
+      - '--image=europe-west1-docker.pkg.dev/mlops-475717/cloud-run-source-deploy/sentiment-api:$SHORT_SHA'
       - '--region=europe-west1'
       - '--platform=managed'
       - '--allow-unauthenticated'
