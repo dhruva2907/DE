@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY app.py .
 
-RUN pip install --no-cache-dir flask transformers torch
+RUN pip install --no-cache-dir fastapi uvicorn google-cloud-storage scikit-learn pydantic
 
 EXPOSE 8080
 
