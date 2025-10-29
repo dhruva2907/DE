@@ -1,0 +1,24 @@
+---
+name: trigger-deployment
+componentSpec:
+  executorLabel: exec-trigger
+  inputDefinitions:
+    parameters:
+      project:
+        parameterType: STRING
+      trigger:
+        parameterType: STRING
+deploymentSpec:
+  executors:
+    exec-trigger:
+      container:
+        image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+        command:
+        - sh
+        - -c
+        - |
+          gcloud builds triggers run $0 --project=$1 --region=us-central1
+        args:
+        - "{{$.inputs.parameters['trigger']}}"
+        - "{{$.inputs.parameters['project']}}"
+
