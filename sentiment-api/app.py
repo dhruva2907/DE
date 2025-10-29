@@ -107,17 +107,30 @@ def home():
 
 @app.get("/info")
 def get_info():
-    """Get comprehensive model metadata from pipeline."""
+    """Get comprehensive model metadata with champion/challenger comparison."""
     version = METADATA.get('current_version', METADATA.get('version', 1))
     accuracy = METADATA.get('current_accuracy', METADATA.get('accuracy', 0.85))
     timestamp = METADATA.get('current_timestamp', METADATA.get('timestamp', datetime.now().isoformat()))
     
+    # Champion/Challenger comparison fields
+    previous_accuracy = METADATA.get('previous_accuracy', accuracy)
+    previous_version = METADATA.get('previous_version', version)
+    is_champion = METADATA.get('is_champion', False)
+    
     response = {
-        # Core metrics
+        # Champion/Challenger comparison
+        "current_version": version,
+        "current_accuracy": float(accuracy),
+        "previous_version": previous_version,
+        "previous_accuracy": float(previous_accuracy) if previous_accuracy else float(accuracy),
+        "is_champion": is_champion,
+        
+        # Legacy fields for backwards compatibility
         "version": version,
         "accuracy": float(accuracy),
         "samples_trained": METADATA.get('samples_trained', 5000),
         "timestamp": timestamp,
+        "current_timestamp": timestamp,
         
         # Performance metrics
         "precision": METADATA.get('precision'),
@@ -130,7 +143,7 @@ def get_info():
         "vectorizer_type": METADATA.get('vectorizer_type', 'TfidfVectorizer'),
         "max_features": METADATA.get('max_features', 5000),
         "max_iterations": METADATA.get('max_iterations', 500),
-        "training_duration": METADATA.get('training_duration_formatted'),
+        "training_duration_formatted": METADATA.get('training_duration_formatted'),
         
         # Dataset info
         "total_samples": METADATA.get('total_samples'),
@@ -146,6 +159,7 @@ def get_info():
     
     # Remove None values
     return {k: v for k, v in response.items() if v is not None}
+
 
 
 @app.post("/predict")
