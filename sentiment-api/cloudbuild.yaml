@@ -7,7 +7,7 @@ steps:
       - 'europe-west1-docker.pkg.dev/mlops-475717/mlops-repo/sentiment-api:$SHORT_SHA'
       - '-t'
       - 'europe-west1-docker.pkg.dev/mlops-475717/mlops-repo/sentiment-api:latest'
-      - '.'
+      - 'sentiment-api'
 
   # Push the Docker image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
