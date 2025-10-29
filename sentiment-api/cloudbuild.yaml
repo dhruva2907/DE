@@ -23,5 +23,7 @@ steps:
       - '--platform=managed'
       - '--allow-unauthenticated'
 
+serviceAccount: 'projects/mlops-475717/serviceAccounts/1058434032117-compute@developer.gserviceaccount.com'
+
 options:
   logging: CLOUD_LOGGING_ONLY
